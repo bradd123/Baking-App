@@ -6,6 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 
@@ -21,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView rvRecipes;
     private RecipesAdapter mRecipesAdapter;
     ArrayList<Recipe> mRecipes;
+    private GestureDetector mGestureDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +42,39 @@ public class MainActivity extends AppCompatActivity {
 
         rvRecipes.setAdapter(mRecipesAdapter);
         rvRecipes.setLayoutManager(new LinearLayoutManager(this));
+
+        mGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return true;
+            }
+        });
+
+        rvRecipes.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+            @Override
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                View childView = rv.findChildViewUnder(e.getX(), e.getY());
+
+                if (childView != null && mGestureDetector.onTouchEvent(e)) {
+                    int position = rv.getChildAdapterPosition(childView);
+
+                    Toast.makeText(MainActivity.this, "Clicked on Item : " + position, Toast.LENGTH_SHORT).show();
+
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
     }
 
     private class RecipeTask extends AsyncTask<String, Void, String> {
