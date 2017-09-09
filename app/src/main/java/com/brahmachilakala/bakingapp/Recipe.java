@@ -5,13 +5,14 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by brahma on 08/09/17.
  */
 
-public class Recipe {
+public class Recipe implements Serializable {
 
     private int mId;
     private String mName;

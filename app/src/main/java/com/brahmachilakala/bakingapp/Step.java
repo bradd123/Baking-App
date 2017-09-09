@@ -5,13 +5,14 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by brahma on 08/09/17.
  */
 
-public class Step {
+public class Step implements Serializable {
     private int mId;
     private String mShortDescription;
     private String mDescription;
@@ -86,5 +87,15 @@ public class Step {
         }
 
         return steps;
+    }
+
+    public static ArrayList<String> getStepShortDescriptions(ArrayList<Step> steps) {
+        ArrayList<String> stepDescriptions = new ArrayList<>();
+
+        for (int i=0;i<steps.size(); i++) {
+            stepDescriptions.add(steps.get(i).getShortDescription());
+        }
+
+        return stepDescriptions;
     }
 }

@@ -5,13 +5,14 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by brahma on 08/09/17.
  */
 
-public class Ingredient {
+public class Ingredient implements Serializable {
     private int mQuantity;
     private String mMeasure;
     private String mIngredient;
@@ -67,5 +68,16 @@ public class Ingredient {
             }
         }
         return ingredients;
+    }
+
+    public static String convertIngredientsToString(ArrayList<Ingredient> ingredients) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i=0;i<ingredients.size();i++) {
+            Ingredient ingredient = ingredients.get(i);
+            stringBuilder.append(ingredient.getIngredient() + "   " + ingredient.getQuantity() + " " + ingredient.getMeasure() + "\n");
+        }
+
+        return stringBuilder.toString();
     }
 }
