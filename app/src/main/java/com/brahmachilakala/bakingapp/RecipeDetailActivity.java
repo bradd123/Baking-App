@@ -1,15 +1,21 @@
 package com.brahmachilakala.bakingapp;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class RecipeDetailActivity extends AppCompatActivity {
     private TextView tvRecipeIngredients;
     private RecyclerView rvSteps;
     private StepsAdapter mStepsAdapter;
+
+    private GestureDetector mGestureDetector;
 
     private Recipe mRecipe;
 
@@ -28,6 +34,39 @@ public class RecipeDetailActivity extends AppCompatActivity {
         rvSteps.setAdapter(mStepsAdapter);
 
         rvSteps.setLayoutManager(new LinearLayoutManager(this));
+
+        mGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return true;
+            }
+        });
+
+        rvSteps.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+            @Override
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                View childView = rv.findChildViewUnder(e.getX(), e.getY());
+
+                if (childView != null && mGestureDetector.onTouchEvent(e)) {
+                    int position = rv.getChildAdapterPosition(childView);
+
+                    Toast.makeText(RecipeDetailActivity.this, "Clicked item at : " + position, Toast.LENGTH_SHORT).show();
+
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
 
     }
 
