@@ -1,5 +1,6 @@
 package com.brahmachilakala.bakingapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,7 +9,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class RecipeDetailActivity extends AppCompatActivity {
     private TextView tvRecipeIngredients;
@@ -50,7 +50,10 @@ public class RecipeDetailActivity extends AppCompatActivity {
                 if (childView != null && mGestureDetector.onTouchEvent(e)) {
                     int position = rv.getChildAdapterPosition(childView);
 
-                    Toast.makeText(RecipeDetailActivity.this, "Clicked item at : " + position, Toast.LENGTH_SHORT).show();
+                    Intent recipeStepActivity = new Intent(RecipeDetailActivity.this, RecipeStepActivity.class);
+                    recipeStepActivity.putExtra("steps", mRecipe.getSteps());
+                    recipeStepActivity.putExtra("position", position);
+                    startActivity(recipeStepActivity);
 
                     return true;
                 }
