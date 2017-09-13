@@ -1,15 +1,20 @@
 package com.brahmachilakala.bakingapp;
 
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -48,6 +53,7 @@ public class RecipeStepFragment extends Fragment {
     private int position;
     private Button mPrevBtn;
     private Button mNextBtn;
+    private boolean mIsPhoneLandscape = false;
 
 
     public RecipeStepFragment() {
@@ -107,6 +113,32 @@ public class RecipeStepFragment extends Fragment {
             }
         });
 
+        Log.i("RecipeStepFragment", "Okay until now, no problem");
+
+        if (getString(R.string.screen_type).equals("phone")) {
+            Display display = ((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+            int rotation = display.getRotation();
+
+            Log.i("RecipeStepFragment", "Got the rotation now");
+
+            if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+                mPrevBtn.setVisibility(View.GONE);
+                mNextBtn.setVisibility(View.GONE);
+                tvStepDescription.setVisibility(View.GONE);
+
+                Log.i("RecipeStepFragment", "Make the buttons and description as gone");
+
+                mIsPhoneLandscape = true;
+
+                ViewGroup.LayoutParams params = mExoPlayerView.getLayoutParams();
+                params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                mExoPlayerView.requestLayout();
+                
+                Log.i("RecipeStepFragment", "set the exoplayer view params");
+            }
+        }
+
         playVideo(mSteps.get(position));
     }
 
@@ -114,15 +146,20 @@ public class RecipeStepFragment extends Fragment {
         if (position <= 0) {
             mPrevBtn.setEnabled(false);
         }
-        if (position >= mSteps.size()) {
+        if (position >= mSteps.size()-1) {
             mNextBtn.setEnabled(false);
         }
     }
 
     private void playVideo(Step step) {
-        setupButtons();
+
+        if (!mIsPhoneLandscape) {
+
+            Log.i("RecipeStepFragment", "Inside the phone landscape");
+            setupButtons();
+            tvStepDescription.setText(step.getDescription());
+        }
         Uri videoUri = Uri.parse(step.getVideoUrl());
-        tvStepDescription.setText(step.getDescription());
 
         DefaultBandwidthMeter defaultBandwidthMeter = new DefaultBandwidthMeter();
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
