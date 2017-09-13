@@ -25,12 +25,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MainFragment extends Fragment {
-    private RecyclerView rvRecipes;
+    @BindView(R.id.rvRecipes) RecyclerView rvRecipes;
     private RecipesAdapter mRecipesAdapter;
     ArrayList<Recipe> mRecipes;
     private GestureDetector mGestureDetector;
@@ -61,14 +64,17 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        View view = inflater.inflate(R.layout.fragment_main, container, false);
+
+        ButterKnife.bind(this, view);
+
+        return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        rvRecipes = (RecyclerView) view.findViewById(R.id.rvRecipes);
         new RecipeTask().execute("https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json");
     }
 
