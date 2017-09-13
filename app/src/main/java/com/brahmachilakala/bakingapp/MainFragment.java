@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -75,7 +76,12 @@ public class MainFragment extends Fragment {
         mRecipesAdapter = new RecipesAdapter(mRecipes);
 
         rvRecipes.setAdapter(mRecipesAdapter);
-        rvRecipes.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        if (getString(R.string.screen_type).equals("phone")) {
+            rvRecipes.setLayoutManager(new LinearLayoutManager(getActivity()));
+        } else {
+            rvRecipes.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        }
 
         mGestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
             @Override
