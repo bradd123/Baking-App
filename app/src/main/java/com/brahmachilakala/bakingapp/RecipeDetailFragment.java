@@ -16,13 +16,16 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class RecipeDetailFragment extends Fragment {
-    private TextView tvRecipeIngredients;
-    private RecyclerView rvSteps;
+    @BindView(R.id.tv_recipe_ingredients) TextView tvRecipeIngredients;
+    @BindView(R.id.rvSteps) RecyclerView rvSteps;
     private StepsAdapter mStepsAdapter;
 
     private GestureDetector mGestureDetector;
@@ -62,7 +65,10 @@ public class RecipeDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_recipe_detail, container, false);
+        View view = inflater.inflate(R.layout.fragment_recipe_detail, container, false);
+        ButterKnife.bind(this, view);
+
+        return view;
     }
 
     @Override
@@ -71,10 +77,8 @@ public class RecipeDetailFragment extends Fragment {
 
         mRecipe = (Recipe) getArguments().getSerializable("recipe");
 
-        tvRecipeIngredients = (TextView) view.findViewById(R.id.tv_recipe_ingredients);
         tvRecipeIngredients.setText(Ingredient.convertIngredientsToString(mRecipe.getIngredients()));
 
-        rvSteps = (RecyclerView) view.findViewById(R.id.rvSteps);
         mStepsAdapter = new StepsAdapter(Step.getStepShortDescriptions(mRecipe.getSteps()));
         rvSteps.setAdapter(mStepsAdapter);
 

@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -37,6 +36,9 @@ import com.google.android.exoplayer2.util.Util;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,14 +47,14 @@ public class RecipeStepFragment extends Fragment {
     private static final String TAG = RecipeStepActivity.class.getSimpleName();
 
     private SimpleExoPlayer mExoPlayer;
-    private SimpleExoPlayerView mExoPlayerView;
-    private TextView tvStepDescription;
+    @BindView(R.id.playerView) SimpleExoPlayerView mExoPlayerView;
+    @BindView(R.id.tv_step_description) TextView tvStepDescription;
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
     private ArrayList<Step> mSteps;
     private int position;
-    private Button mPrevBtn;
-    private Button mNextBtn;
+    @BindView(R.id.bt_prev) Button mPrevBtn;
+    @BindView(R.id.bt_next) Button mNextBtn;
     private boolean mIsPhoneLandscape = false;
 
 
@@ -74,14 +76,16 @@ public class RecipeStepFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_recipe_step, container, false);
+        View view = inflater.inflate(R.layout.fragment_recipe_step, container, false);
+        ButterKnife.bind(this, view);
+
+        return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mExoPlayerView = (SimpleExoPlayerView) view.findViewById(R.id.playerView);
         mSteps = (ArrayList<Step>) getArguments().getSerializable("steps");
         position = getArguments().getInt("position", 0);
 
@@ -91,8 +95,6 @@ public class RecipeStepFragment extends Fragment {
         TrackSelector trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
         mExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
         mExoPlayerView.setPlayer(mExoPlayer);
-
-        tvStepDescription = (TextView) view.findViewById(R.id.tv_step_description);
 
         mPrevBtn = (Button) view.findViewById(R.id.bt_prev);
         mNextBtn = (Button) view.findViewById(R.id.bt_next);
@@ -113,20 +115,14 @@ public class RecipeStepFragment extends Fragment {
             }
         });
 
-        Log.i("RecipeStepFragment", "Okay until now, no problem");
-
         if (getString(R.string.screen_type).equals("phone")) {
             Display display = ((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
             int rotation = display.getRotation();
-
-            Log.i("RecipeStepFragment", "Got the rotation now");
 
             if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
                 mPrevBtn.setVisibility(View.GONE);
                 mNextBtn.setVisibility(View.GONE);
                 tvStepDescription.setVisibility(View.GONE);
-
-                Log.i("RecipeStepFragment", "Make the buttons and description as gone");
 
                 mIsPhoneLandscape = true;
 
@@ -134,8 +130,6 @@ public class RecipeStepFragment extends Fragment {
                 params.height = ViewGroup.LayoutParams.MATCH_PARENT;
                 params.width = ViewGroup.LayoutParams.MATCH_PARENT;
                 mExoPlayerView.requestLayout();
-                
-                Log.i("RecipeStepFragment", "set the exoplayer view params");
             }
         }
 
@@ -154,8 +148,6 @@ public class RecipeStepFragment extends Fragment {
     private void playVideo(Step step) {
 
         if (!mIsPhoneLandscape) {
-
-            Log.i("RecipeStepFragment", "Inside the phone landscape");
             setupButtons();
             tvStepDescription.setText(step.getDescription());
         }
