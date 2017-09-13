@@ -2,76 +2,70 @@ package com.brahmachilakala.bakingapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.TextView;
 
-public class RecipeDetailActivity extends AppCompatActivity {
-    private TextView tvRecipeIngredients;
-    private RecyclerView rvSteps;
-    private StepsAdapter mStepsAdapter;
+import java.util.ArrayList;
 
-    private GestureDetector mGestureDetector;
+public class RecipeDetailActivity extends AppCompatActivity implements RecipeDetailFragment.IntentSendListener {
 
-    private Recipe mRecipe;
+    private boolean mTwoPane;
+    int position = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
 
-        mRecipe = (Recipe) getIntent().getSerializableExtra("recipe");
+        if (findViewById(R.id.fragment_recipe_step) != null) {
+            mTwoPane = true;
 
-        tvRecipeIngredients = (TextView) findViewById(R.id.tv_recipe_ingredients);
-        tvRecipeIngredients.setText(Ingredient.convertIngredientsToString(mRecipe.getIngredients()));
+            Recipe recipe = (Recipe) getIntent().getSerializableExtra("recipe");
+            RecipeDetailFragment recipeDetailFragment = RecipeDetailFragment.newInstance(recipe);
 
-        rvSteps = (RecyclerView) findViewById(R.id.rvSteps);
-        mStepsAdapter = new StepsAdapter(Step.getStepShortDescriptions(mRecipe.getSteps()));
-        rvSteps.setAdapter(mStepsAdapter);
+            FragmentManager fragmentManager = getSupportFragmentManager();
 
-        rvSteps.setLayoutManager(new LinearLayoutManager(this));
+            fragmentManager.beginTransaction()
+                    .add(R.id.fragment_recipe_detail, recipeDetailFragment)
+                    .commit();
 
-        mGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                return true;
-            }
-        });
+            ArrayList<Step> steps = recipe.getSteps();
+            RecipeStepFragment recipeStepFragment = RecipeStepFragment.newInstance(steps, position);
+            fragmentManager.beginTransaction()
+                    .add(R.id.fragment_recipe_step, recipeStepFragment)
+                    .commit();
 
-        rvSteps.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                View childView = rv.findChildViewUnder(e.getX(), e.getY());
 
-                if (childView != null && mGestureDetector.onTouchEvent(e)) {
-                    int position = rv.getChildAdapterPosition(childView);
 
-                    Intent recipeStepActivity = new Intent(RecipeDetailActivity.this, RecipeStepActivity.class);
-                    recipeStepActivity.putExtra("steps", mRecipe.getSteps());
-                    recipeStepActivity.putExtra("position", position);
-                    startActivity(recipeStepActivity);
+        } else {
+            mTwoPane = false;
 
-                    return true;
-                }
-                return false;
-            }
+            Recipe recipe = (Recipe) getIntent().getSerializableExtra("recipe");
 
-            @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+            RecipeDetailFragment fragment = RecipeDetailFragment.newInstance(recipe);
 
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-            }
-        });
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_recipe_detail, fragment)
+                    .commit();
+        }
 
     }
 
 
+    @Override
+    public void startIntent(ArrayList<Step> steps, int position) {
+
+        if (mTwoPane) {
+            RecipeStepFragment recipeStepFragment = RecipeStepFragment.newInstance(steps, position);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_recipe_step, recipeStepFragment)
+                    .commit();
+        } else {
+            Intent recipeStepActivity = new Intent(RecipeDetailActivity.this, RecipeStepActivity.class);
+            recipeStepActivity.putExtra("steps", steps);
+            recipeStepActivity.putExtra("position", position);
+            startActivity(recipeStepActivity);
+        }
+    }
 }
