@@ -1,6 +1,8 @@
 package com.brahmachilakala.bakingapp;
 
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -26,12 +30,13 @@ import butterknife.ButterKnife;
 public class RecipeDetailFragment extends Fragment {
     @BindView(R.id.tv_recipe_ingredients) TextView tvRecipeIngredients;
     @BindView(R.id.rvSteps) RecyclerView rvSteps;
+    @BindView(R.id.bt_set_widget_text)
+    Button mSetWidgetText;
     private StepsAdapter mStepsAdapter;
-
     private GestureDetector mGestureDetector;
-
     private Recipe mRecipe;
     private IntentSendListener mListener;
+    private String mIngredientsListText;
 
     public interface IntentSendListener {
         public void startIntent(ArrayList<Step> steps, int position);
@@ -76,8 +81,21 @@ public class RecipeDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mRecipe = (Recipe) getArguments().getSerializable("recipe");
+        mIngredientsListText = Ingredient.convertIngredientsToString(mRecipe.getIngredients());
+        tvRecipeIngredients.setText(mIngredientsListText);
 
-        tvRecipeIngredients.setText(Ingredient.convertIngredientsToString(mRecipe.getIngredients()));
+        mSetWidgetText.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                Context context = RecipeDetailFragment.this.getActivity();
+                AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+                RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.recipe_widget_provider);
+                ComponentName thisWidget = new ComponentName(context, RecipeWidgetProvider.class);
+                remoteViews.setTextViewText(R.id.appwidget_text, mIngredientsListText);
+                appWidgetManager.updateAppWidget(thisWidget, remoteViews);
+            }
+        });
 
         mStepsAdapter = new StepsAdapter(Step.getStepShortDescriptions(mRecipe.getSteps()));
         rvSteps.setAdapter(mStepsAdapter);

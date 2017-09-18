@@ -7,6 +7,12 @@
         android:id="@+id/tv_recipe_ingredients"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/bt_set_widget_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show it in widget"
+        android:gravity="center"/>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvSteps"
         android:layout_width="match_parent"
